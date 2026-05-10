@@ -14,7 +14,20 @@ Token-aware prompt optimizer with automatic model selection, budget enforcement,
 - ✅ YAML-driven configuration (no code changes required)
 
 ---
-
+## 🔧 Package as VSIX (Installable Extension)
+1) Install packaging tool
+```
+npm install -g @vscode/vsce
+```
+2) Build your extension
+```
+npm install
+npm run compile
+```
+3) Generate .vsix
+``
+vsce package
+```
 ## 🧠 How It Works
 
 1. Select code (optional)
@@ -31,5 +44,3 @@ Token-aware prompt optimizer with automatic model selection, budget enforcement,
 ---
 
 ## 📂 Configuration
-
-All behavior is controlled via:
