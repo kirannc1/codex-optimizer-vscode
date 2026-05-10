@@ -1,0 +1,67 @@
+# =========================
+# Node modules (largest)
+# =========================
+node_modules/
+
+# =========================
+# Build output
+# =========================
+out/
+dist/
+build/
+
+# =========================
+# VSIX packages
+# =========================
+*.vsix
+
+# =========================
+# Logs
+# =========================
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# =========================
+# Environment variables
+# =========================
+.env
+.env.*
+!.env.example
+
+# =========================
+# OS files
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# VSCode local settings
+# =========================
+.vscode/*
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/tasks.json
+
+# =========================
+# TypeScript cache
+# =========================
+*.tsbuildinfo
+
+# =========================
+# Coverage / testing
+# =========================
+coverage/
+.nyc_output/
+
+# =========================
+# Temporary files
+# =========================
+*.tmp
+*.temp
+
+# =========================
+# Optional: local config overrides
+# =========================
+codex-optimizer.local.yaml

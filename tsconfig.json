@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "Node16",              // ✅ REQUIRED with node16
+    "moduleResolution": "node16",    // ✅ modern resolver
+    "lib": ["ES2020"],
+    "outDir": "out",
+    "rootDir": "src",
+    "strict": true,
+    "sourceMap": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "types": ["node"],
+    "skipLibCheck": true
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", ".vscode-test"]
+}

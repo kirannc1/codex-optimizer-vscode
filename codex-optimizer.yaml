@@ -1,0 +1,205 @@
+# codex-optimizer.yaml
+
+version: 1
+
+globals:
+  rules:
+    - "Do not repeat input"
+    - "Follow output format strictly"
+    - "No explanation unless asked"
+    - "Prefer minimal diff over full rewrite"
+    - "Respect line/token limits strictly"
+  optimization_hints:
+    - "Use shortest correct solution"
+    - "Avoid duplication"
+    - "Avoid unnecessary structure"
+  fail_fast_token: "INSUFFICIENT_BUDGET"
+
+models:
+  high:
+    input_cost_per_1k: 10.0
+    output_cost_per_1k: 30.0
+    max_context: 200000
+  mid:
+    input_cost_per_1k: 3.0
+    output_cost_per_1k: 10.0
+    max_context: 128000
+  low:
+    input_cost_per_1k: 0.5
+    output_cost_per_1k: 1.5
+    max_context: 64000
+
+routing:
+  # capability-first, then cheapest-fit
+  rules:
+    design:   ["high", "mid"]
+    debug:    ["high", "mid"]
+    impl:     ["mid", "high"]
+    refactor: ["mid", "high"]
+    tests:    ["low", "mid"]
+    doc:      ["low", "mid"]
+
+budgets:
+  max_input_tokens: 6000
+  max_total_tokens: 7500
+  default_output_tokens: 150
+
+phases:
+
+  design_api:
+    task_type: design
+    template:
+      task: "Define API contract for <MODULE_NAME>."
+      context: "<ARCH_STATE>"
+      Requirement:
+      <REQUIREMENT>
+      output_format: |
+        Endpoint:
+        Request:
+        Response:
+        Errors:
+    budgets:
+      input: 300
+      output: 120
+
+  design_diff:
+    task_type: design
+    template:
+      task: "Update API to support <NEW_REQUIREMENT>."
+      context: |
+        Existing API:
+        <previous output only>
+      Requirement:
+      <REQUIREMENT>
+      output_format: "Diff-style update"
+    budgets:
+      input: 200
+      output: 80
+
+  skeleton:
+    task_type: impl
+    inputs:
+      - key: CLASS_NAME
+        prompt: "Enter class name"
+      - key: LANG
+        prompt: "Enter programming language"
+      - key: TYPES
+        prompt: "Enter input/output types (comma separated)"
+    template:
+      task: "Generate class skeleton for <CLASS_NAME>."
+      context: |
+        Language: <LANG>
+        Inputs: <TYPES>
+        Outputs: <TYPES>
+      output_format: "Single class only"
+    budgets:
+      input: 200
+      output: 200
+
+  impl_core:
+    task_type: impl
+    template:
+      task: "Implement logic: <REQUIREMENT>."
+      context: |
+        Function:
+        <ONLY the function>
+      output_format: "Updated function"
+    budgets:
+      input: 300
+      output: 180
+
+  impl_extend:
+    task_type: impl
+    template:
+      task: "Extend logic to handle: <NEW_CASE>."
+      context: |
+        Function:
+        <latest function only>
+      output_format: "Updated function"
+    budgets:
+      input: 250
+      output: 150
+
+  refactor:
+    task_type: refactor
+    template:
+      task: "Refactor to reduce complexity."
+      context: "<function only>"
+      output_format: "Refactored function"
+    budgets:
+      input: 300
+      output: 180
+
+  debug:
+    task_type: debug
+    template:
+      task: "Fix the defect."
+      context: |
+        Error:
+        <exact error>
+
+        Code:
+        <minimal failing snippet ONLY>
+      output_format: |
+        Cause:
+        <1 line>
+
+        Fix:
+        <code>
+    budgets:
+      input: 250
+      output: 120
+
+  retry_fix:
+    task_type: impl
+    template:
+      task: "Correct the issue."
+      context: |
+        Problem:
+        <1–2 lines>
+
+        Code:
+        <only incorrect part>
+      output_format: "Corrected section"
+    budgets:
+      input: 150
+      output: 80
+
+  tests:
+    task_type: tests
+    template:
+      task: "Generate unit tests."
+      context: |
+        Function:
+        <function>
+
+        Cases:
+        - <case1>
+        - <case2>
+        - <case3>
+      output_format: "Test code only"
+    budgets:
+      input: 300
+      output: 220
+
+  doc:
+    task_type: doc
+    template:
+      task: "Add concise docstring."
+      context: "<function>"
+      output_format: "Docstring only"
+    budgets:
+      input: 150
+      output: 40
+
+  arch_state:
+    task_type: design
+    template:
+      task: "Summarize system state."
+      context: "<design notes>"
+      output_format: |
+        [ARCH_STATE vX]
+        ...
+    budgets:
+      input: 800
+      output: 200
